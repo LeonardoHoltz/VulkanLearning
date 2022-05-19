@@ -12,6 +12,8 @@
 #include <cstring>
 
 #include <vector>
+#include <map>
+#include <optional>
 
 class HelloTriangleApplication {
 public:
@@ -32,7 +34,16 @@ private:
 	const bool enableValidationLayers = true;
 #endif
 
-	/* === VARIABLES === */
+	/* === STRUCTURES === */
+	struct QueueFamilyIndices {
+		std::optional<uint32_t> graphicsFamily;
+
+		bool hasGraphicQueue() {
+			return graphicsFamily.has_value();
+		}
+	};
+
+	/* === CLASS MEMBERS === */
 
 	GLFWwindow* window = nullptr;
 
@@ -41,6 +52,10 @@ private:
 	VkDebugUtilsMessengerEXT debugMessenger;
 
 	VkPhysicalDevice physicalDevice = VK_NULL_HANDLE; // implicity destroyed when VkInstance is destroyed.
+
+	VkDevice device;
+
+	VkQueue graphicsQueue; // implicity destroyed when VkDevice is destroyed.
 
 	/* === FUNCTIONS === */
 
@@ -56,9 +71,17 @@ private:
 	bool checkValidationLayerSupport();
 	std::vector<const char*> getRequiredExtensions();
 
-	/* Physical device*/
+	/* =========== Physical device =========== */
 	void pickPhysicalDevice();
-	bool isDeviceSuitable(VkPhysicalDevice device);
+	int rateDeviceSuitability(VkPhysicalDevice device);
+
+	/* =========== Logical Device =========== */
+	void createLogicalDevice();
+
+	/* =========== Queues =========== */
+
+	/* Find at least one queue for graphic commands */
+	QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
 
 	/* Debug */
 
